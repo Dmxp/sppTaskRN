@@ -96,3 +96,17 @@ VALUES
     '2025-01-01',
     NULL
 );
+
+-- Дополнительные элементы СПП 
+INSERT INTO spp_items
+(parent_id, code, name, is_active, valid_from, valid_to)
+VALUES
+(1, '1.3', 'Блок развития', TRUE, '2025-01-01', NULL),
+(9, '1.3.1', 'Отдел стратегических проектов', TRUE, '2025-01-01', NULL),
+(9, '1.3.2', 'Отдел аналитики', TRUE, '2025-01-01', NULL);
+
+INSERT INTO spp_departments
+(spp_id, department_id)
+VALUES
+(10, 3),
+(11, 1);
