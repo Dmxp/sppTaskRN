@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+
 const API_URL = "http://localhost:8000";
 const SESSION_ID = "demo-session";
 
@@ -258,37 +259,60 @@ function TreeNode({
   selectedIds,
   onToggle
 }: {
-  key?: number;
   node: SppNode;
   selectedIds: number[];
   onToggle: (id: number) => void;
 }) {
+  const [expanded, setExpanded] = useState(true);
+
   const checked = selectedIds.includes(node.id);
+  const hasChildren = node.children.length > 0;
 
   return (
     <div className="tree-node">
-      <div className="node-row">
+      <div className={`node-row ${checked ? "selected" : ""}`}>
+        <button
+          className="expand-button"
+          onClick={() => setExpanded(!expanded)}
+          disabled={!hasChildren}
+          type="button"
+        >
+          {hasChildren ? (expanded ? "▼" : "▶") : "•"}
+        </button>
+
         <input
           type="checkbox"
           checked={checked}
           onChange={() => onToggle(node.id)}
         />
 
-        <span className="node-code">{node.code}</span>
-        <span>{node.name}</span>
+        <div className="node-main">
+          <div className="node-title">
+            <span className="node-code">{node.code}</span>
+            <span>{node.name}</span>
 
-        {node.departments.length > 0 && (
-          <small>
-            ({node.departments.map((department) => department.name).join(", ")})
-          </small>
-        )}
+            <span className={node.is_active ? "status active" : "status inactive"}>
+              {node.is_active ? "Действующий" : "Недействующий"}
+            </span>
+          </div>
 
-        <span className="node-amount">
-          {node.amount > 0 ? `${node.amount.toLocaleString()} ₽` : ""}
-        </span>
+          {node.departments.length > 0 && (
+            <div className="department-list">
+              {node.departments.map((department) => (
+                <span className="department-badge" key={department.id}>
+                  {department.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="node-amount">
+          {node.amount > 0 ? `${node.amount.toLocaleString("ru-RU")} ₽` : "—"}
+        </div>
       </div>
 
-      {node.children.length > 0 && (
+      {hasChildren && expanded && (
         <div className="children">
           {node.children.map((child) => (
             <TreeNode

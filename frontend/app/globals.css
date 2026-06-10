@@ -129,3 +129,102 @@ select {
 .saved-item small {
   color: #667085;
 }
+
+.tree-node {
+  margin: 6px 0;
+}
+
+.node-row {
+  display: grid;
+  grid-template-columns: 32px 24px 1fr 140px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: 0.15s ease;
+}
+
+.node-row:hover {
+  background: #f4f7fb;
+  border-color: #dbe5f3;
+}
+
+.node-row.selected {
+  background: #eef5ff;
+  border-color: #93c5fd;
+}
+
+.expand-button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: #edf2f7;
+  color: #344054;
+  cursor: pointer;
+}
+
+.expand-button:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.node-main {
+  min-width: 0;
+}
+
+.node-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.node-code {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.status {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.department-list {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.department-badge {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #475467;
+}
+
+.node-amount {
+  text-align: right;
+  font-weight: 700;
+  color: #101828;
+}
+
+.children {
+  margin-left: 28px;
+  border-left: 1px dashed #cbd5e1;
+  padding-left: 14px;
+}
