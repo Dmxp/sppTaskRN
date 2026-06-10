@@ -30,6 +30,16 @@ services:
       - redis
     ports:
       - "8000:8000"
+  
+  frontend:
+    build:
+      context: ./frontend
+    container_name: spp_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
 
 volumes:
   postgres_data:
