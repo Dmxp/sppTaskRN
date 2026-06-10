@@ -1,0 +1,7 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: spp_postgres
+    environment:
+      POSTGRES_DB: spp_db
+      POSTGRES_USER: spp_user
