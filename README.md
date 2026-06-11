@@ -101,9 +101,9 @@ valid_from <= :target_date AND (valid_to IS NULL OR valid_to > :target_date)
 ## API
 
 - `GET /api/dates` — список доступных дат изменений.
-- `GET /api/tree?target_date=2025-06-01` — дерево СПП на дату.
+- `GET /api/tree?version_date=2025-06-01` — дерево СПП на дату.
 - `POST /api/calculate` — выполнить расчет и сохранить результат в Redis.
-- `POST /api/save` — перенести расчет из Redis в PostgreSQL.
+- `POST /api/save/{redis_id}` — перенести расчет из Redis в PostgreSQL.
 - `GET /api/calculations?session_id=...` — список сохраненных расчетов.
 - `GET /api/calculations/{id}` — загрузить сохраненный расчет.
 - `GET /api/export/{id}` — скачать Excel-файл.
@@ -135,5 +135,7 @@ valid_from <= :target_date AND (valid_to IS NULL OR valid_to > :target_date)
 ## Ограничения прототипа
 
 - CRUD СПП не реализован, так как в задании он не требуется.
-- Авторизация не реализована; для синхронизации используется `session_id`, который создается на фронтенде и хранится в `localStorage`.
+- Авторизация не реализована.
+- Для демонстрации механизма WebSocket-синхронизации используется фиксированный идентификатор сессии `demo-session`.
+- В реальном приложении `session_id` должен генерироваться для каждого пользователя отдельно и храниться в браузере либо передаваться через систему авторизации.
 - Демо-данные загружаются через `postgres/init.sql` при первом старте контейнера PostgreSQL.
