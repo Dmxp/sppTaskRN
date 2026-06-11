@@ -69,7 +69,7 @@ valid_from <= :target_date AND (valid_to IS NULL OR valid_to > :target_date)
 
 Связь отделов с элементами СПП. Связь также имеет период действия.
 
-### `calculation_results`
+### `calculationы`
 
 Таблица сохраненных вариантов:
 
@@ -78,9 +78,9 @@ valid_from <= :target_date AND (valid_to IS NULL OR valid_to > :target_date)
 - `created_at`
 - `status`
 - `spp_version_date`
-- `snapshot JSONB`
+- `result JSON`
 
-В `snapshot` хранится полный снимок распределенной структуры.
+В `result` хранится полный снимок распределенной структуры.
 
 ## Алгоритм распределения
 
