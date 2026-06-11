@@ -165,7 +165,6 @@ export default function HomePage() {
       <div className="grid">
         <section className="card">
           <h2>Структура СПП</h2>
-
           <div className="controls">
             <select
               className="select"
