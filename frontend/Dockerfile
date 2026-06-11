@@ -2,9 +2,6 @@ FROM node:22-bookworm-slim
 
 WORKDIR /app
 
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
-ENV NEXT_TELEMETRY_DISABLED=1
-
 COPY package.json package-lock.json ./
 
 RUN npm config set strict-ssl false \
@@ -12,6 +9,8 @@ RUN npm config set strict-ssl false \
 
 COPY . .
 
+RUN npm run build
+
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

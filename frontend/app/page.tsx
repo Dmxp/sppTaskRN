@@ -90,27 +90,195 @@ export default function HomePage() {
     setCalculations(data);
   }
 
-  function toggleNode(id: number) {
-    setSelectedIds((previous) => {
-      if (previous.includes(id)) {
-        return previous.filter((item) => item !== id);
+  function findNodeById(nodes: SppNode[], id: number): SppNode | null {
+    for (const node of nodes) {
+      if (node.id === id) {
+        return node;
       }
 
-      return [...previous, id];
+      const child = findNodeById(node.children, id);
+
+      if (child) {
+        return child;
+      }
+    }
+
+    return null;
+  }
+
+  function getAllChildIds(node: SppNode): number[] {
+    return [
+      node.id,
+      ...node.children.flatMap((child) => getAllChildIds(child))
+    ];
+  }
+
+  function getParentIds(
+    nodes: SppNode[],
+    targetId: number,
+    parents: number[] = []
+  ): number[] {
+    for (const node of nodes) {
+      if (node.id === targetId) {
+        return parents;
+      }
+
+      const result = getParentIds(
+        node.children,
+        targetId,
+        [...parents, node.id]
+      );
+
+      if (result.length > 0) {
+        return result;
+      }
+    }
+
+    return [];
+  }
+
+  function toggleNode(id: number) {
+    const node = findNodeById(tree, id);
+
+    if (!node) return;
+
+    const nodeIds = getAllChildIds(node);
+
+    setSelectedIds((prev) => {
+      let next = [...prev];
+
+      const isSelected = prev.includes(id);
+
+      if (isSelected) {
+        next = next.filter((item) => !nodeIds.includes(item));
+
+        const parents = getParentIds(tree, id);
+
+        next = next.filter((item) => !parents.includes(item));
+      } else {
+        next = [...new Set([...next, ...nodeIds])];
+
+        const parents = getParentIds(tree, id);
+
+        for (const parentId of parents.reverse()) {
+          const parentNode = findNodeById(tree, parentId);
+
+          if (!parentNode) continue;
+
+          const allChildrenSelected = parentNode.children.every(
+            (child) => next.includes(child.id)
+          );
+
+          if (allChildrenSelected) {
+            next.push(parentId);
+          }
+        }
+      }
+
+      return [...new Set(next)];
     });
+  }
+
+
+  // function getAllChildIds(node: SppNode): number[] {
+  //   let ids = [node.id];
+
+  //   for (const child of node.children) {
+  //     ids = [...ids, ...getAllChildIds(child)];
+  //   }
+
+  //   return ids;
+  // }
+
+  // function toggleNode(id: number) {
+  //   const findNode = (nodes: SppNode[]): SppNode | null => {
+  //     for (const node of nodes) {
+  //       if (node.id === id) return node;
+
+  //       const child = findNode(node.children);
+
+  //       if (child) return child;
+  //     }
+
+  //     return null;
+  //   };
+
+  //   const node = findNode(tree);
+
+  //   if (!node) return;
+
+  //   const idsToToggle = getAllChildIds(node);
+
+  //   setSelectedIds((previous) => {
+  //     const allSelected = idsToToggle.every((item) =>
+  //       previous.includes(item)
+  //     );
+
+  //     if (allSelected) {
+  //       return previous.filter(
+  //         (item) => !idsToToggle.includes(item)
+  //       );
+  //     }
+
+  //     return [...new Set([...previous, ...idsToToggle])];
+  //   });
+  // }
+
+  // function toggleNode(id: number) {
+  //   setSelectedIds((previous) => {
+  //     if (previous.includes(id)) {
+  //       return previous.filter((item) => item !== id);
+  //     }
+
+  //     return [...previous, id];
+  //   });
+  // }
+
+  function getTopLevelSelectedIds(): number[] {
+    function hasSelectedParent(
+      targetId: number,
+      nodes: SppNode[],
+      parentSelected = false
+    ): boolean {
+      for (const node of nodes) {
+        const currentSelected = selectedIds.includes(node.id);
+
+        if (node.id === targetId) {
+          return parentSelected;
+        }
+
+        const result = hasSelectedParent(
+          targetId,
+          node.children,
+          parentSelected || currentSelected
+        );
+
+        if (result) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    return selectedIds.filter(
+      (id) => !hasSelectedParent(id, tree)
+    );
   }
 
   async function calculate() {
     setLoading(true);
 
     try {
+      const topLevelIds = getTopLevelSelectedIds();
+
       const response = await fetch(`${API_URL}/api/calculate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          selected_ids: selectedIds,
+          selected_ids: topLevelIds,
           total_amount: Number(amount),
           version_date: versionDate,
           session_id: SESSION_ID
@@ -125,6 +293,35 @@ export default function HomePage() {
       setLoading(false);
     }
   }
+
+  // async function calculate() {
+  //   setLoading(true);
+
+  //   try {
+  //     const response = await fetch(`${API_URL}/api/calculate`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json"
+  //       },
+
+  //       const topLevelIds = getTopLevelSelectedIds();
+
+  //       body: JSON.stringify({
+  //         selected_ids: topLevelIds,
+  //         total_amount: Number(amount),
+  //         version_date: versionDate,
+  //         session_id: SESSION_ID
+  //       })
+  //     });
+
+  //     const data = await response.json();
+
+  //     setRedisId(data.redis_id);
+  //     setTree(data.tree);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
   async function saveCalculation() {
     if (!redisId) return;
@@ -165,7 +362,6 @@ export default function HomePage() {
       <div className="grid">
         <section className="card">
           <h2>Структура СПП</h2>
-
           <div className="controls">
             <select
               className="select"
