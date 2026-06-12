@@ -42,6 +42,8 @@ export default function HomePage() {
   const [calculations, setCalculations] = useState<CalculationItem[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [isOpeningCalculation, setIsOpeningCalculation] = useState(false);
+
   useEffect(() => {
     loadDates();
     loadCalculations();
@@ -55,11 +57,11 @@ export default function HomePage() {
     return () => socket.close();
   }, []);
 
-  useEffect(() => {
-    if (versionDate) {
-      loadTree(versionDate);
-    }
-  }, [versionDate]);
+  // useEffect(() => {
+  //   if (versionDate) {
+  //     loadTree(versionDate);
+  //   }
+  // }, [versionDate]);
 
   async function loadDates() {
     const response = await fetch(`${API_URL}/api/dates`);
@@ -69,7 +71,24 @@ export default function HomePage() {
 
     if (data.length > 0) {
       setVersionDate(data[0]);
+      await loadTree(data[0]);
     }
+  }
+
+  // async function loadDates() {
+  //   const response = await fetch(`${API_URL}/api/dates`);
+  //   const data = await response.json();
+
+  //   setDates(data);
+
+  //   if (data.length > 0) {
+  //     setVersionDate(data[0]);
+  //   }
+  // }
+
+  async function handleVersionDateChange(date: string) {
+    setVersionDate(date);
+    await loadTree(date);
   }
 
   async function loadTree(date: string) {
@@ -333,15 +352,43 @@ export default function HomePage() {
     setRedisId("");
     await loadCalculations();
   }
-
+  
   async function loadCalculation(id: number) {
     const response = await fetch(`${API_URL}/api/calculations/${id}`);
     const data = await response.json();
 
-    setTree(data.result_json.tree);
     setVersionDate(data.spp_version_date);
+    setTree(data.result_json.tree);
+    setSelectedIds([]);
     setRedisId("");
   }
+
+  // async function loadCalculation(id: number) {
+  //   setIsOpeningCalculation(true);
+
+  //   try {
+  //     const response = await fetch(`${API_URL}/api/calculations/${id}`);
+  //     const data = await response.json();
+
+  //     setVersionDate(data.spp_version_date);
+  //     setTree(data.result_json.tree);
+  //     setSelectedIds([]);
+  //     setRedisId("");
+  //   } finally {
+  //     setTimeout(() => {
+  //       setIsOpeningCalculation(false);
+  //     }, 100);
+  //   }
+  // }
+
+  // async function loadCalculation(id: number) {
+  //   const response = await fetch(`${API_URL}/api/calculations/${id}`);
+  //   const data = await response.json();
+
+  //   setTree(data.result_json.tree);
+  //   setVersionDate(data.spp_version_date);
+  //   setRedisId("");
+  // }
 
   function downloadExcel(id: number) {
     window.open(`${API_URL}/api/export/${id}`, "_blank");
@@ -366,7 +413,7 @@ export default function HomePage() {
             <select
               className="select"
               value={versionDate}
-              onChange={(event) => setVersionDate(event.target.value)}
+              onChange={(event) => handleVersionDateChange(event.target.value)}
             >
               {dates.map((date) => (
                 <option key={date} value={date}>
