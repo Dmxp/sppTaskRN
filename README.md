@@ -20,7 +20,6 @@ docker compose up --build
 - Frontend: http://localhost:3000
 - Backend Swagger: http://localhost:8000/docs
 - PostgreSQL: localhost:5432
-- Redis: localhost:6379
 
 ## Сценарий проверки
 
@@ -69,7 +68,7 @@ valid_from <= :target_date AND (valid_to IS NULL OR valid_to > :target_date)
 
 Связь отделов с элементами СПП. Связь также имеет период действия.
 
-### `calculationы`
+### `calculations`
 
 Таблица сохраненных вариантов:
 
