@@ -4,7 +4,7 @@
 
 ## Стек
 
-- Backend: Python 3.13, FastAPI, SQLAlchemy 2, asyncpg
+- Backend: Python 3.13, FastAPI, SQLAlchemy 2, psycopg2-binary
 - Frontend: Next.js 15, React 19, TypeScript
 - Database: PostgreSQL 17
 - Cache: Redis 8
@@ -12,6 +12,7 @@
 - Infrastructure: Docker Compose
 
 ## Запуск
+Перед запуском должен быть установлен и запущен Docker Desktop.
 
 docker compose up --build
 
@@ -37,7 +38,7 @@ docker compose up --build
 1. Пользователь выбирает элементы СПП и вводит сумму.
 2. Backend получает актуальное дерево на выбранную дату.
 3. Алгоритм распределяет сумму по выбранным веткам.
-4. Результат сохраняется в Redis по ключу `calc:{uuid}` с TTL 30 минут.
+4. Результат сохраняется в Redis по ключу `calculation:{uuid}` с TTL 30 минут.
 5. После нажатия `Сохранить` backend переносит JSON-снимок из Redis в PostgreSQL.
 6. После успешного сохранения backend отправляет WebSocket-событие всем подключениям с тем же `session_id`.
 7. Frontend получает событие и обновляет список сохраненных вариантов без перезагрузки.
@@ -52,7 +53,7 @@ docker compose up --build
 - `parent_id`
 - `code`
 - `name`
-- `status`
+- `is_active`
 - `valid_from`
 - `valid_to`
 
@@ -64,7 +65,7 @@ valid_from <= :target_date AND (valid_to IS NULL OR valid_to > :target_date)
 
 Справочник отделов.
 
-### `spp_department_links`
+### `spp_department`
 
 Связь отделов с элементами СПП. Связь также имеет период действия.
 
